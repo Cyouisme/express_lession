@@ -1,34 +1,38 @@
-// server.js
-// where your node app starts
+var express = require("express");
+var app = express();
+var port = 3000;
+app.set("views", "./views");
+app.set("view engine", "pug");
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-// we've started you off with Express (https://expressjs.com/)
-// but feel free to use whatever libraries or frameworks you'd like through `package.json`.
-const express = require("express");
-const app = express();
-
-// our default array of dreams
-const dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
+var users = [
+  { task: 1, work: "Cooking rice" },
+  { task: 2, work: "Learing code" },
+  { task: 3, work: "Workout" }
 ];
-
-// make all the files in 'public' available
-// https://expressjs.com/en/starter/static-files.html
-app.use(express.static("public"));
-
-// https://expressjs.com/en/starter/basic-routing.html
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/views/index.html");
+app.get("/todos", (req, res) =>
+  res.render("index", {
+    users: users
+  })
+);
+app.get("/todos/task", function(req, res) {
+  var q = req.query.q;
+  var findKey = users.filter(function(user) {
+    return user.work.toLowerCase().indexOf(q.toLowerCase()) !== -1;
+  });
+  res.render("index", {
+    users: findKey,
+    valued: q
+  });
 });
-
-// send the default array of dreams to the webpage
-app.get("/dreams", (request, response) => {
-  // express helps us take JS objects and send them as JSON
-  response.json(dreams);
-});
-
-// listen for requests :)
-const listener = app.listen(process.env.PORT, () => {
-  console.log("Your app is listening on port " + listener.address().port);
+app.get("/todos/create",function(req,res){
+  res.render('create')
+})
+app.post("/todos/create",function(req,res){
+  users.push(req.body)
+  res.redirect("/todos")
+})
+app.listen(port, function() {
+  console.log("Server listening on port " + port);
 });
