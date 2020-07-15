@@ -1,5 +1,4 @@
 var express = require("express");
-const e = require("express");
 var app = express();
 var port = 3000;
 app.set("views", "./views");
